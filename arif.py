@@ -12,26 +12,27 @@ def json_open(file):
 
 def recursive(node, obj, debug):
     """ recursive json """
-    if isinstance(obj, list):
-        for item in obj:
-            if debug: print("list -> {0}".format(item))
-            recursive(node, item, debug)
-    elif isinstance(obj, dict):
+    if isinstance(obj, dict):
         for k, v in obj.items():
             if isinstance(v, list):
                 if debug: print("dict_list -> {0} - {1}".format(k, v))
-                node.addkid(recursive(node, v, debug))
+                newnode = node.addkid(Node("{0}".format(k)))
+                recursive(newnode, v, debug)
             elif isinstance(v, dict):
                 if debug: print("dict_dict -> {0} - {1}".format(k, v))
-                node.addkid(recursive(node, v, debug))
+                newnode = node.addkid(Node("{0}".format(k)))
+                recursive(newnode, v, debug)
             else:
                 if debug: print("dict_kid -> {0} - {1}".format(k, v))
                 node.addkid(Node("{0} - {1}".format(k, v)))
-    else:
-        return obj
+    elif isinstance(obj, list):
+        for item in obj:
+            if debug: print("list -> {0}".format(item))
+            recursive(node, item, debug)
 
 if __name__ == "__main__":
     JSON = json_open(sys.argv[1])
     root = Node("root")
-    result = recursive(root, JSON, True)
-    print("\n", result, sep="")
+    
+    recursive(root, JSON, True)
+    print("\n", root, sep="")
